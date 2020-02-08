@@ -47,7 +47,7 @@ export default {
   }),
   created() {
     this.paginationOptions = [...options];
-    this.paginationSelection = this.default;
+    this.paginationSelection = this.numberPerPage;
   },
   watch: {
     paginationSelection(val) {
@@ -63,7 +63,8 @@ export default {
     },
     hasNext() {
       return (
-        this.selectedPageLocal !== this.itemsCount % this.paginationSelection
+        this.selectedPageLocal !==
+        this.itemsCount / this.paginationSelection - 1
       );
     }
   }

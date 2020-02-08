@@ -110,7 +110,8 @@ export default {
     },
     scrollableTableData() {
       const start = this.currentPage * this.pagination;
-      return this.resolvedTableData.slice(start, this.pagination);
+      const endOfNextPage = (this.currentPage + 1) * this.pagination;
+      return this.resolvedTableData.slice(start, endOfNextPage);
     }
   },
   methods: {
