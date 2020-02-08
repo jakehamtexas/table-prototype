@@ -52,20 +52,25 @@ export default {
   watch: {
     paginationSelection(val) {
       this.$emit("update:numberPerPage", val);
+      const paginationIsOutOfBoundsRight =
+        this.selectedPageLocal > this.lastPageNumber;
+      if (paginationIsOutOfBoundsRight) {
+        this.selectedPageLocal = this.lastPageNumber;
+      }
     },
     selectedPageLocal(val) {
       this.$emit("update:selectedPage", val);
     }
   },
   computed: {
+    lastPageNumber() {
+      return this.itemsCount / this.paginationSelection - 1;
+    },
     hasPrevious() {
       return this.selectedPageLocal !== 0;
     },
     hasNext() {
-      return (
-        this.selectedPageLocal !==
-        this.itemsCount / this.paginationSelection - 1
-      );
+      return this.selectedPageLocal !== this.lastPageNumber;
     }
   }
 };
