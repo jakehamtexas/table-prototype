@@ -3,7 +3,7 @@
     <TableSearch :keys="searchKeys" @included-keys-changed="addKeysToFilters" />
     <TablePaginator
       :number-per-page.sync="pagination"
-      :selected-page.sync="pageNumber"
+      :selected-page.sync="currentPage"
       :items-count="resolvedTableData.length"
     />
     <table>
@@ -12,6 +12,7 @@
           :property-name="'a'"
           :filters="numberFilters"
           :sorts="numberSorts"
+          :column-header="'Aaaaaa'"
           @sort="applySort"
           @filter="upsertFilter"
         />
@@ -19,11 +20,13 @@
           :property-name="'b'"
           :filters="feetFilters"
           :sorts="feetSorts"
+          :column-header="'BBBBBB'"
           @sort="applySort"
           @filter="upsertFilter"
         />
         <TableColumnHeader
           :property-name="'c'"
+          :column-header="'Ccccc'"
           :filters="textFilters"
           :sorts="textSorts"
           @sort="applySort"
@@ -31,7 +34,7 @@
         />
       </thead>
       <tbody>
-        <tr v-for="data of scrollableTableData" :key="getKey(data)">
+        <tr v-for="data of scrollableTableData" :key="data.searchKey">
           <td>{{data.a}}</td>
           <td>{{data.b}}</td>
           <td>{{data.c}}</td>
@@ -46,6 +49,8 @@ import TableSearch from "./TableSearch";
 import TablePaginator from "./TablePaginator";
 import TableColumnHeader from "./TableColumnHeader";
 import { testData } from "../testData";
+import { feetFilters, numberFilters, textFilters } from "../filters";
+import { feetSorts, plainSorts } from "../sorts";
 export default {
   name: "TableOrchestrator",
   components: {
@@ -57,33 +62,46 @@ export default {
     tableData: [],
     filters: [],
     sorts: [],
-    pagination: 0,
-    currentPage: 0
+    pagination: 5,
+    currentPage: 0,
+
+    numberFilters,
+    feetFilters,
+    textFilters,
+
+    numberSorts: plainSorts,
+    feetSorts,
+    textSorts: plainSorts
   }),
   created() {
     this.tableData = testData;
   },
   computed: {
-    tableDataBySearchKey() {
+    tableDataWithSearchKeys() {
       return this.tableData.map(datum => {
         const searchKey = Object.values(datum)
           .map(value => `${value}`.toLowerCase())
           .join("");
-        return {
-          [searchKey]: datum
-        };
+        return { ...datum, searchKey };
       });
     },
     searchKeys() {
-      return Object.keys(this.tableDataBySearchKey);
+      return this.tableDataWithSearchKeys.map(data => data.searchKey);
     },
     resolvedTableData() {
-      const tableDataBySearchKey = this.tableDataBySearchKey;
-      const filteredTableData = this.filters.reduce(
-        (filteredTableData, filterFunc) =>
-          filteredTableData.filter(filterFunc()),
-        [...tableDataBySearchKey]
-      );
+      const tableDataWithSearchKeys = this.tableDataWithSearchKeys;
+      const filteredTableData = this.filters
+        .map(filter =>
+          filter.filterText
+            ? filter.filterFunc(filter.filterText)
+            : filter.filterFunc
+        )
+        .reduce(
+          (filteredTableData, filterFunc) =>
+            filteredTableData.filter(filterFunc),
+          [...tableDataWithSearchKeys]
+        );
+
       const sortedTableData = this.sorts.reduce(
         (sortedTableData, sortFunc) => sortedTableData.sort(sortFunc),
         [...filteredTableData]
@@ -98,39 +116,28 @@ export default {
   methods: {
     addKeysToFilters(keys) {
       const filterId = "tableSearchKeys";
-      const tableSearchKeyFilterIndex = this.filters.indexOf(
+      const tableSearchKeyFilterIndex = this.filters.findIndex(
         filter => filter.filterId === filterId
       );
       const tableSearchKeyFilterFunction = tableDataItem =>
-        keys.some(key => tableDataItem[key]);
+        keys.some(key => tableDataItem.searchKey === key);
       this.filters.splice(tableSearchKeyFilterIndex, 1, {
         filterId,
         filterFunc: tableSearchKeyFilterFunction
       });
     },
     applySort(propertyName, sortFunc) {
-      this.sorts = [sortFunc]; //doesn't support more than one sort at a time
+      this.sorts = [sortFunc(propertyName)]; //doesn't support more than one sort at a time
     },
-    upsertFilter(propertyName, filterFunc) {
-      const filterId = propertyName;
-      const filterIndex = this.filters.indexOf(
-        filter => filter.filterId === filterId
+    upsertFilter(filterPayload) {
+      const filterIndex = this.filters.findIndex(
+        filter => filter.filterId === filterPayload.filterId
       );
-
       if (filterIndex !== -1) {
-        this.filters.splice(filterIndex, 1, {
-          filterId,
-          filterFunc
-        });
+        this.filters.splice(filterIndex, 1, filterPayload);
       } else {
-        this.filters.push({
-          filterId,
-          filterFunc
-        });
+        this.filters.push(filterPayload);
       }
-    },
-    getTemplateKey(data) {
-      return Object.keys(data)[0];
     }
   }
 };

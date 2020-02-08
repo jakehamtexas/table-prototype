@@ -1,24 +1,20 @@
-const testData = [
-  {
-    a: 1,
-    b: "6 ft",
-    c: "hello"
-  },
-  {
-    a: 4,
-    b: "5 ft",
-    c: "sup"
-  },
-  {
-    a: 3,
-    b: "3 ft",
-    c: "ni hao"
-  },
-  {
-    a: -6,
-    b: "69 ft",
-    c: "bonjour"
-  }
-];
+const getRandomInt = () => {
+  return Math.ceil(Math.random() * 100);
+};
+const getRandomFeet = () => {
+  return `${getRandomInt()} ft`;
+};
+const getRandomString = () => {
+  return Math.random()
+    .toString(36)
+    .substring(2, 15);
+};
+const getRandomObject = () => ({
+  a: getRandomInt(),
+  b: getRandomFeet(),
+  c: getRandomString()
+});
+// eslint-disable-next-line no-unused-vars
+const testData = new Array(100).fill(null).map(_ => getRandomObject());
 
 export { testData };

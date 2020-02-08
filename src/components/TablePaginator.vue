@@ -13,7 +13,7 @@
 </template>
 
 <script>
-const options = [5, 10, 25, 50, 100, 200, 500, Infinity];
+const options = [5, 10, 25, 50, 100, 200, 500, Infinity]; //https://www.reddit.com/r/vuejs/comments/eqgnap/wanted_to_share_my_first_vue_component_a_virtual/
 export default {
   name: "TablePaginator",
   props: {
