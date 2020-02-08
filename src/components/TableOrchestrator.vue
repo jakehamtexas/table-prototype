@@ -12,31 +12,34 @@
           :property-name="'a'"
           :filters="numberFilters"
           :sorts="numberSorts"
-          :column-header="'Aaaaaa'"
           @sort="applySort"
           @filter="upsertFilter"
         />
+        <NumberColumnHeader :property-name="'a'" @sort="applySort" @filter="upsertFilter">AAAAAAAAA</NumberColumnHeader>
         <TableColumnHeader
           :property-name="'b'"
           :filters="feetFilters"
           :sorts="feetSorts"
-          :column-header="'BBBBBB'"
           @sort="applySort"
           @filter="upsertFilter"
         />
+        <FeetColumnHeader :property-name="'b'" @sort="applySort" @filter="upsertFilter">BBBBBBBB</FeetColumnHeader>
         <TableColumnHeader
           :property-name="'c'"
-          :column-header="'Ccccc'"
           :filters="textFilters"
           :sorts="textSorts"
           @sort="applySort"
           @filter="upsertFilter"
         />
+        <TextColumnHeader :property-name="'c'" @sort="applySort" @filter="upsertFilter">CCCCCCC</TextColumnHeader>
       </thead>
       <tbody>
         <tr v-for="data of scrollableTableData" :key="data.searchKey">
           <td>{{data.a}}</td>
+          <td>{{data.a}}</td>
           <td>{{data.b}}</td>
+          <td>{{data.b}}</td>
+          <td>{{data.c}}</td>
           <td>{{data.c}}</td>
         </tr>
       </tbody>
@@ -47,7 +50,12 @@
 <script>
 import TableSearch from "./TableSearch";
 import TablePaginator from "./TablePaginator";
-import TableColumnHeader from "./TableColumnHeader";
+import {
+  TableColumnHeader,
+  TextColumnHeader,
+  FeetColumnHeader,
+  NumberColumnHeader
+} from "./ColumnHeader";
 import { testData } from "../testData";
 import { feetFilters, numberFilters, textFilters } from "../filters";
 import { feetSorts, plainSorts } from "../sorts";
@@ -56,7 +64,12 @@ export default {
   components: {
     TableSearch,
     TablePaginator,
-    TableColumnHeader
+
+    //column headers
+    TableColumnHeader,
+    TextColumnHeader,
+    FeetColumnHeader,
+    NumberColumnHeader
   },
   data: () => ({
     tableData: [],
