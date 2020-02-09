@@ -122,9 +122,12 @@ export default {
       return sortedTableData;
     },
     scrollableTableData() {
-      const start = this.currentPage * this.pagination;
-      const endOfNextPage = (this.currentPage + 1) * this.pagination;
-      return this.resolvedTableData.slice(start, endOfNextPage);
+      if (this.pagination !== Infinity) {
+        const start = this.currentPage * this.pagination;
+        const endOfNextPage = (this.currentPage + 1) * this.pagination;
+        return this.resolvedTableData.slice(start, endOfNextPage);
+      }
+      return this.resolvedTableData;
     }
   },
   methods: {
@@ -152,6 +155,11 @@ export default {
       } else {
         this.filters.push(filterPayload);
       }
+    }
+  },
+  watch: {
+    scrollableTableData(val) {
+      this.infiniteScrollItems = val;
     }
   }
 };

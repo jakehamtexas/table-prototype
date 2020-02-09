@@ -15,6 +15,6 @@ const getRandomObject = () => ({
   c: getRandomString()
 });
 // eslint-disable-next-line no-unused-vars
-const testData = new Array(100).fill(null).map(_ => getRandomObject());
+const testData = new Array(10000).fill(null).map(_ => getRandomObject());
 
 export { testData };
